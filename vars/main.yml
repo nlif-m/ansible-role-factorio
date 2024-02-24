@@ -1,0 +1,6 @@
+---
+# vars file for factorio
+factorio_binary_path: "{{ factorio_main_dir }}/factorio/bin/x64/factorio"
+factorio_server_game_save_path: "{{ factorio_saves_dir }}/{{ factorio_game_save_name }}"
+factorio_server_settings_path: "{{ factorio_main_dir }}/{{ factorio_server_settings_file_name }}"
+factorio_download_uri: "https://www.factorio.com/get-download/{{ factorio_version }}/headless/linux64"

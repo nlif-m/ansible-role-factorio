@@ -1,0 +1,16 @@
+[Unit]
+Description=Factorio headless server
+After=network.target
+
+[Service]
+ExecStart={{ factorio_binary_path | quote }} --start-server {{ factorio_server_game_save_path | quote }} --server-settings {{ factorio_server_settings_path | quote }}  --port {{ factorio_server_port | quote }}
+User={{ factorio_username }}
+Group={{ factorio_username }}
+Type=simple
+Restart=always
+TimeoutStopSec=30
+
+
+[Install]
+WantedBy=default.target
+RequiredBy=network.target

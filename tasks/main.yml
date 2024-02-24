@@ -1,0 +1,93 @@
+---
+# tasks file for factorio
+
+- name: Factorio | Create factorio user
+  user:
+    create_home: true
+    name: "{{ factorio_username }}"
+
+
+- name: Factorio | Create factorio main directory
+  file:
+    path: "{{ factorio_main_dir }}"
+    state: directory
+    owner: "{{ factorio_username }}"
+    group: "{{ factorio_username }}"
+    mode: "0700"
+      
+- name: Factorio | Create factorio saves directory
+  file:
+    path: "{{ factorio_saves_dir }}"
+    state: directory
+    owner: "{{ factorio_username }}"
+    group: "{{ factorio_username }}"
+    mode: "0700"
+
+- name: "Factorio | Download factorio v{{ factorio_version }} headless server"
+  get_url:
+    url: "{{ factorio_download_uri }}"
+    dest: "{{ factorio_main_dir }}/factorio_{{ factorio_version }}.tar.xz"
+    owner: "factorio"
+    group: "factorio"
+    mode: "0700"
+
+- name: "Factorio | Unarchive factorio v{{ factorio_version }} headless server"
+  unarchive:
+    src: "{{ factorio_main_dir }}/factorio_{{ factorio_version }}.tar.xz"
+    dest: "{{ factorio_main_dir }}"
+    remote_src: true
+    owner: "factorio"
+    group: "factorio"
+    creates: "{{ factorio_main_dir }}/factorio"
+    mode: "0700"
+    # TODO: If change a version will not Unarchive need to fix
+
+- name: Factorio | Install factorio server-settings
+  template:
+    src: "templates/server-settings.json.j2"
+    dest: "{{ factorio_server_settings_path }}"
+    owner: "{{ factorio_username }}"
+    group: "{{ factorio_username }}"
+    mode: "0700"
+    # TODO: validate using json linter/fmt
+
+- name: Factorio | Check existence of game save
+  stat:
+    path: "{{ factorio_server_game_save_path }}"
+  register: game_save
+
+- name: Factorio | Generate defalt save if not have one and don\'t use local one
+  become: true
+  become_user: "{{ factorio_username }}"
+  command:
+    argv:
+      - "{{ factorio_binary_path }}"
+      - "--create"
+      - "{{ factorio_server_game_save_path }}"
+  when:
+    - game_save.stat.exists == False
+    - factorio_local_save_path == ""
+
+- name: Factorio | Copy local game save to server
+  copy:
+    src: "{{ factorio_local_save_path }}"
+    dest: "{{ factorio_server_game_save_path }}"
+    owner: "{{ factorio_username }}"
+    group: "{{ factorio_username }}"
+    mode: "0700"
+    backup: true
+  when:
+    - game_save.stat.exists == False
+    - factorio_local_save_path != ""
+
+- name: Factorio | Install factorio systemd service
+  template:
+    src: "templates/factorio.service.j2"
+    dest: "/etc/systemd/system/{{ factorio_systemd_service_name }}"
+    mode: "0700"
+
+- name: Factorio | Run factorio systemd service
+  systemd:
+    name: "{{ factorio_systemd_service_name }}"
+    daemon_reload: true
+    state: "started"

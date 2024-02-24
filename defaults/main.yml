@@ -1,0 +1,27 @@
+---
+# defaults file for factorio
+
+factorio_version: "1.1.104"
+factorio_username: "factorio"
+factorio_main_dir: "/opt/factorio"
+factorio_saves_dir: "/opt/factorio/saves"
+factorio_local_save_path: ""
+factorio_server_port: "34197"
+factorio_server_settings_file_name: "server-settings.json"
+factorio_game_save_name: "factorio_save.zip"
+factorio_systemd_service_name: "factorio.service"
+
+# server-settings.json
+factorio_server_name: "Name of the game as it will appear in the game listing"
+factorio_server_description: "Description of the game that will appear in the listing"
+factorio_server_visibility_public: "false"
+factorio_server_visibility_lan: "true"
+factorio_server_game_password: "123"
+factorio_server_username: ""
+factorio_server_password: ""
+factorio_server_token: ""
+factorio_server_require_user_verification: "false"
+factorio_server_autosave_slots: 5
+factorio_server_auto_pause: "true"
+factorio_server_only_admins_can_pause_the_game: "false"
+
