@@ -6,7 +6,6 @@
     create_home: true
     name: "{{ factorio_username }}"
 
-
 - name: Factorio | Create factorio main directory
   file:
     path: "{{ factorio_main_dir }}"
@@ -50,6 +49,9 @@
     group: "{{ factorio_username }}"
     mode: "0700"
     # TODO: validate using json linter/fmt
+  notify:
+    - Restart factorio
+      
 
 - name: Factorio | Check existence of game save
   stat:
@@ -67,6 +69,8 @@
   when:
     - game_save.stat.exists == False
     - factorio_local_save_path == ""
+  notify:
+    - Restart factorio
 
 - name: Factorio | Copy local game save to server
   copy:
@@ -79,13 +83,17 @@
   when:
     - game_save.stat.exists == False
     - factorio_local_save_path != ""
+  notify:
+    - Restart factorio
 
 - name: Factorio | Install factorio systemd service
   template:
     src: "templates/factorio.service.j2"
     dest: "/etc/systemd/system/{{ factorio_systemd_service_name }}"
     mode: "0700"
-
+  notify:
+    - Restart factorio
+  
 - name: Factorio | Run factorio systemd service
   systemd:
     name: "{{ factorio_systemd_service_name }}"
