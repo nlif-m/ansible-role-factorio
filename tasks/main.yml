@@ -78,6 +78,14 @@
     - factorio_local_save_path == ""
   notify:
     - Restart factorio
+    
+- name: Factorio | Stop factorio systemd service before copying local game save to server
+  systemd:
+    name: "{{ factorio_systemd_service_name }}"
+    state: "stopped"
+  when:
+    - game_save.stat.exists == False
+    - factorio_local_save_path != ""
 
 - name: Factorio | Copy local game save to server
   copy:
