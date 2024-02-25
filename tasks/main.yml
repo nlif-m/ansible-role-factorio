@@ -1,6 +1,13 @@
 ---
 # tasks file for factorio
 
+- name: Factorio | Install needed software
+  apt:
+    name:
+      - tar
+      - xz-utils
+    state: present
+
 - name: Factorio | Create factorio user
   user:
     create_home: true
