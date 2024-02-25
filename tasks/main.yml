@@ -6,6 +6,7 @@
     name:
       - tar
       - xz-utils
+      - jq
     state: present
 
 - name: Factorio | Create factorio user
@@ -55,10 +56,10 @@
     owner: "{{ factorio_username }}"
     group: "{{ factorio_username }}"
     mode: "0700"
-    # TODO: validate using json linter/fmt
+    validate: "/usr/bin/jq . %s"
+      
   notify:
     - Restart factorio
-      
 
 - name: Factorio | Check existence of game save
   stat:
