@@ -24,4 +24,4 @@ factorio_server_require_user_verification: "false"
 factorio_server_autosave_slots: 5
 factorio_server_auto_pause: "true"
 factorio_server_only_admins_can_pause_the_game: "false"
-
+factorio_server_autosave_only_on_server: "true"
