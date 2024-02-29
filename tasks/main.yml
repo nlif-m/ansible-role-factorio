@@ -2,7 +2,7 @@
 # tasks file for factorio
 
 - name: Factorio | Install needed software
-  apt:
+  ansible.builtin.apt:
     name:
       - tar
       - xz-utils
@@ -10,28 +10,28 @@
     state: present
 
 - name: Factorio | Create factorio user
-  user:
+  ansible.builtin.user:
     create_home: true
     name: "{{ factorio_username }}"
 
 - name: Factorio | Create factorio main directory
-  file:
+  ansible.builtin.file:
     path: "{{ factorio_main_dir }}"
     state: directory
     owner: "{{ factorio_username }}"
     group: "{{ factorio_username }}"
     mode: "0700"
-      
+
 - name: Factorio | Create factorio saves directory
-  file:
+  ansible.builtin.file:
     path: "{{ factorio_saves_dir }}"
     state: directory
     owner: "{{ factorio_username }}"
     group: "{{ factorio_username }}"
     mode: "0700"
 
-- name: "Factorio | Download factorio v{{ factorio_version }} headless server"
-  get_url:
+- name: "Factorio | Download factorio headless server v{{ factorio_version }}"
+  ansible.builtin.get_url:
     url: "{{ factorio_download_uri }}"
     dest: "{{ factorio_main_dir }}/{{ factorio_download_archive_name }}"
     owner: "factorio"
@@ -39,8 +39,8 @@
     mode: "0700"
     checksum: "{{ factorio_download_checksum }}"
 
-- name: "Factorio | Unarchive factorio v{{ factorio_version }} headless server"
-  unarchive:
+- name: "Factorio | Unarchive factorio headless server v{{ factorio_version }}"
+  ansible.builtin.unarchive:
     src: "{{ factorio_main_dir }}/{{ factorio_download_archive_name }}"
     dest: "{{ factorio_main_dir }}"
     remote_src: true
@@ -51,7 +51,7 @@
     # TODO: If change a version will not Unarchive need to fix
 
 - name: Factorio | Install factorio server-settings
-  template:
+  ansible.builtin.template:
     src: "templates/server-settings.json.j2"
     dest: "{{ factorio_server_settings_path }}"
     owner: "{{ factorio_username }}"
@@ -62,34 +62,35 @@
     - Restart factorio
 
 - name: Factorio | Check existence of game save
-  stat:
+  ansible.builtin.stat:
     path: "{{ factorio_server_game_save_path }}"
   register: game_save
 
 - name: Factorio | Generate defalt save if not have one and don\'t use local one
   become: true
   become_user: "{{ factorio_username }}"
-  command:
+  ansible.builtin.command:
     argv:
       - "{{ factorio_binary_path }}"
       - "--create"
       - "{{ factorio_server_game_save_path }}"
   when:
-    - game_save.stat.exists == False
+    - not game_save.stat.exists
     - factorio_local_save_path == ""
   notify:
     - Restart factorio
+  changed_when: true
 
 - name: Factorio | Stop factorio systemd service before copying local game save to server
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ factorio_systemd_service_name }}"
     state: "stopped"
   when:
-    - game_save.stat.exists == False
+    - not game_save.stat.exists
     - factorio_local_save_path != ""
 
 - name: Factorio | Copy local game save to server
-  copy:
+  ansible.builtin.copy:
     src: "{{ factorio_local_save_path }}"
     dest: "{{ factorio_server_game_save_path }}"
     owner: "{{ factorio_username }}"
@@ -97,13 +98,13 @@
     mode: "0700"
     backup: true
   when:
-    - game_save.stat.exists == False
+    - not game_save.stat.exists
     - factorio_local_save_path != ""
   notify:
     - Restart factorio
 
 - name: Factorio | Install factorio systemd service
-  template:
+  ansible.builtin.template:
     src: "templates/factorio.service.j2"
     dest: "/etc/systemd/system/{{ factorio_systemd_service_name }}"
     mode: "0700"
@@ -111,7 +112,7 @@
     - Restart factorio
 
 - name: Factorio | Run factorio systemd service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ factorio_systemd_service_name }}"
     daemon_reload: true
     state: "started"

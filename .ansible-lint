@@ -1,0 +1,3 @@
+# This file contains ignores rule violations for ansible-lint
+skip_list:
+  - yaml[line-length]
