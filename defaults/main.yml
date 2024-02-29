@@ -2,6 +2,7 @@
 # defaults file for factorio
 
 factorio_version: "1.1.104"
+factorio_download_checksum: "sha256:8e13353ab23d57989db7b06594411d30885de1a923f3a989d12749c1abc01583"  # https://www.factorio.com/download/sha256sums/  # factorio_headless_x64_VERSION.tar.xz
 factorio_username: "factorio"
 factorio_main_dir: "/opt/factorio"
 factorio_saves_dir: "/opt/factorio/saves"

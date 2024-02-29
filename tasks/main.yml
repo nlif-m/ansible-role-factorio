@@ -33,14 +33,15 @@
 - name: "Factorio | Download factorio v{{ factorio_version }} headless server"
   get_url:
     url: "{{ factorio_download_uri }}"
-    dest: "{{ factorio_main_dir }}/factorio_{{ factorio_version }}.tar.xz"
+    dest: "{{ factorio_main_dir }}/{{ factorio_download_archive_name }}"
     owner: "factorio"
     group: "factorio"
     mode: "0700"
+    checksum: "{{ factorio_download_checksum }}"
 
 - name: "Factorio | Unarchive factorio v{{ factorio_version }} headless server"
   unarchive:
-    src: "{{ factorio_main_dir }}/factorio_{{ factorio_version }}.tar.xz"
+    src: "{{ factorio_main_dir }}/{{ factorio_download_archive_name }}"
     dest: "{{ factorio_main_dir }}"
     remote_src: true
     owner: "factorio"
@@ -57,7 +58,6 @@
     group: "{{ factorio_username }}"
     mode: "0700"
     validate: "/usr/bin/jq . %s"
-      
   notify:
     - Restart factorio
 
@@ -79,7 +79,7 @@
     - factorio_local_save_path == ""
   notify:
     - Restart factorio
-    
+
 - name: Factorio | Stop factorio systemd service before copying local game save to server
   systemd:
     name: "{{ factorio_systemd_service_name }}"
@@ -109,7 +109,7 @@
     mode: "0700"
   notify:
     - Restart factorio
-  
+
 - name: Factorio | Run factorio systemd service
   systemd:
     name: "{{ factorio_systemd_service_name }}"
