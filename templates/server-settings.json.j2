@@ -10,8 +10,8 @@
                           "lan: Game will be broadcast on LAN"],
   "visibility":
   {
-    "public": "false",
-    "lan": "true"
+    "public": "{{ factorio_server_visibility_public }}",
+    "lan": "{{ factorio_server_visibility_lan }}"
   },
 
   "_comment_credentials": "Your factorio.com login credentials. Required for games with visibility public",
